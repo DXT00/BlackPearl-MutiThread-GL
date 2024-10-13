@@ -1,4 +1,5 @@
 //https://zhuanlan.zhihu.com/p/339880005
+//https://www.cnblogs.com/yang131/p/16753516.html
 #include <list>
 #include <thread>
 #include <condition_variable>
