@@ -45,7 +45,6 @@ include_directories(
         # "${CMAKE_CURRENT_SOURCE_DIR}/vendor/spdlog/include"
         # 注意：下面的路径需要根据实际情况调整，特别是那些使用了占位符的路径
         # "${CMAKE_CURRENT_SOURCE_DIR}/../%{IncludeDir.GLFW}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/vendor/GLEW/include"
         "${CMAKE_CURRENT_SOURCE_DIR}/vendor/Glad/include"
         "${CMAKE_CURRENT_SOURCE_DIR}/vendor"
         "${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm"
@@ -83,7 +82,7 @@ if(${RENDER_API} STREQUAL "opengl")
         target_link_libraries(
                 BlackPearl-MultiThread-GL
                 PRIVATE
-                glfw
+                GLFW
                 GLEW
                 Glad
                 opengl32
