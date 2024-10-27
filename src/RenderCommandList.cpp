@@ -59,11 +59,14 @@ void RenderCommandList::ConsumeRenderCommand(int idx)
 		// cast arguments according to the command type
 		switch (type) {
 		case RenderCommandType::CompileShader:
-			SCompileShader(static_cast<ShaderMeta*>(args));
+			printf("[cmd] CompileShader\n");
+			//SCompileShader(static_cast<ShaderMeta*>(args));
 			break;
 		case RenderCommandType::ShaderUse: {
-			unsigned int* p = static_cast<unsigned int*>(args);
-			glUseProgram(*p);
+			printf("[cmd] ShaderUse\n");
+
+			/*unsigned int* p = static_cast<unsigned int*>(args);
+			glUseProgram(*p);*/
 		}
 			break;
 		default:
@@ -74,12 +77,17 @@ void RenderCommandList::ConsumeRenderCommand(int idx)
 	command_list->clear();
 }
 
-void RenderCommandList::PushRenderCommand(RenderCommandType command, void* args)
+void RenderCommandList::PushRenderCommand(int list_idx, RenderCommandType command, void* args)
 {
+	render_command_lists[list_idx]->push_back(RenderCommand(command, args));
 }
 
 RenderCommandList::RenderCommandList()
 {
+	for (size_t i = 0; i < 2; i++)
+	{
+		render_command_lists[i] = new std::list<RenderCommand>();
+	}
 }
 
 RenderCommandList::~RenderCommandList()

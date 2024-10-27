@@ -34,7 +34,7 @@ public:
 	}
 	// do NOT call this in logical thread!
 	void ConsumeRenderCommand(int idx);
-	void PushRenderCommand(RenderCommandType command, void* args);
+	void PushRenderCommand(int list_idx, RenderCommandType command, void* args);
 	inline void SetCurrentLogicalList(int n) { current_logical_list = n; }
 	~RenderCommandList();
 private:

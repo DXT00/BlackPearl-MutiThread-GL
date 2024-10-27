@@ -25,12 +25,13 @@ endif ()
 
 
 message(STATUS "CMAKE_RUNTIME_OUTPUT_DIRECTORY---${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+message(STATUS "CMAKE_CFG_INTDIR---${CMAKE_CFG_INTDIR}")
 
 # 添加源文件
 file(GLOB_RECURSE SRC_FILES LIST_DIRECTORIES false "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h")
 
 # 创建静态库目标
-add_library(BlackPearl-MultiThread-GL STATIC ${SRC_FILES})
+add_executable(BlackPearl-MultiThread-GL ${SRC_FILES})
 
 # 宏定义
 add_definitions(
@@ -54,13 +55,33 @@ include_directories(
         "${CMAKE_CURRENT_SOURCE_DIR}/vendor/GLEW/include"
 
 )
-# 库目录
-link_directories(
+# 条件判断
+if(CMAKE_BUILD_TYPE AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -O0")
+    message("Debug mode:${CMAKE_C_FLAGS_DEBUG}")
 
-        # "${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui/bin/${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ImGui"
-        # "${CMAKE_CURRENT_SOURCE_DIR}/vendor/spdlog/bin/${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/spdlog"
-        "${CMAKE_CURRENT_SOURCE_DIR}/vendor/GLFW/bin/${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/GLFW"
+elseif(CMAKE_BUILD_TYPE AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Wall -O3")
+    message("Release mode:${CMAKE_C_FLAGS_RELEASE}")
+else()
+    message("else:${CMAKE_BUILD_TYPE}")
+    message("else:${CMAKE_C_FLAGS_RELEASE}")
+endif()
+
+# 库目录
+target_link_directories(
+        BlackPearl-MultiThread-GL
+        PRIVATE 
+        #${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui/bin/${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ImGui
+        ${CMAKE_CURRENT_SOURCE_DIR}/vendor/spdlog/bin/Debug
+        ${CMAKE_CURRENT_SOURCE_DIR}/vendor/assimp/bin/Debug
+        ${CMAKE_CURRENT_SOURCE_DIR}/vendor/GLFW/bin/Debug
+        ${CMAKE_CURRENT_SOURCE_DIR}/vendor/GLEW/bin/Debug
+        ${CMAKE_CURRENT_SOURCE_DIR}/vendor/Glad/bin/Debug
+
+
 )
+message(STATUS "${CMAKE_CURRENT_SOURCE_DIR}/vendor/GLFW/bin/Debug")
 
 # 定义一个选项，但暂时不指定其值
 option(RENDER_API "Select render api type (default: opengl)" "opengl")
@@ -106,7 +127,7 @@ elseif(${RENDER_API} STREQUAL "vulkan")
     target_link_libraries(
             BlackPearl-MultiThread-GL
             PRIVATE
-            glfw
+            GLFW
             GLEW
             Glad
             ImGui
@@ -123,7 +144,7 @@ elseif(${RENDER_API} STREQUAL "direct3d")
     target_link_libraries(
             BlackPearl-MultiThread-GL
             PRIVATE
-            glfw
+            GLFW
             GLEW
             Glad
             ImGui
@@ -138,10 +159,10 @@ else() #default opengl
     target_link_libraries(
             BlackPearl-MultiThread-GL
             PRIVATE
-            glfw
+            GLFW
             GLEW
             Glad
-            ImGui
+            #ImGui
             opengl32
             assimp-vc142-mtd
             spdlog
