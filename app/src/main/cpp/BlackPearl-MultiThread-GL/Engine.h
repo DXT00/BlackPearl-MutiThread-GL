@@ -3,7 +3,7 @@
 class Engine
 {
 public:
-	static inline Engine* Instance() {
+	static inline Engine* GetInstance() {
 		static Engine singleton;
 		return &singleton;
 	}
