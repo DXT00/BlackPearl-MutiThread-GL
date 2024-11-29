@@ -42,6 +42,7 @@ if(WIN32)
     set(ARCH "win64")
 elseif(ANDROID)
     set(ARCH "arm64-v8a")
+    message(STATUS "building andriod")
 endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${OUTPUT_DIR}/${ARCH}")
@@ -54,10 +55,11 @@ file(GLOB_RECURSE SRC_FILES LIST_DIRECTORIES false "${SRC_DIR}/*.cpp" "${SRC_DIR
 
 # 创建动态库目标
 #add_executable(BlackPearl-MultiThread-GL ${SRC_FILES})
-add_library(${CMAKE_PROJECT_NAME} STATIC
+add_library(${CMAKE_PROJECT_NAME} SHARED
         # List C/C++ source files with relative paths to this CMakeLists.txt.
         native-lib.cpp
         ${SRC_FILES}
+        ../../../../../BlackPearl-MutiThread-GL/src/pch.h
 )
 
 # 宏定义
@@ -141,7 +143,8 @@ if(${RENDER_API} STREQUAL "opengl")
                 PRIVATE
                 EGL
                 GLESv3
-                assimp
+                #assimp
+                log
                 android
         )
     endif ()

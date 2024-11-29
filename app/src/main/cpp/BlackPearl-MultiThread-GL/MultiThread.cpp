@@ -85,7 +85,7 @@ static void* RenderThread() {//Semaphore& logic_barriers, Semaphore& render_barr
 
 	}
 
-	Engine::Instance()->Exit();
+	Engine::GetInstance()->Exit();
 
 	Window::Instance()->Delete();
 	std::cout << "render thread: exit.\n";

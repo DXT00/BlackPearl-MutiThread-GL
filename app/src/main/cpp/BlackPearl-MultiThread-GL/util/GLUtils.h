@@ -12,6 +12,7 @@
 #include <GLES3/gl3.h>
 #include <GLES3/gl31.h>
 #include <string>
+#include "glm/glm.hpp"
 //#include "glob.h"
 
 #define SHADER_TO_STRING(s) #s

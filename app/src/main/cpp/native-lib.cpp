@@ -104,13 +104,13 @@ extern "C" jint JNI_OnLoad(JavaVM *jvm, void *p)
         return JNI_ERR;
     }
 
-    regRet = RegisterNativeMethods(env, NATIVE_BG_RENDER_CLASS_NAME, g_BgRenderMethods,
-                                   sizeof(g_BgRenderMethods) /
-                                   sizeof(g_BgRenderMethods[0]));
-    if (regRet != JNI_TRUE)
-    {
-        return JNI_ERR;
-    }
+//    regRet = RegisterNativeMethods(env, NATIVE_BG_RENDER_CLASS_NAME, g_BgRenderMethods,
+//                                   sizeof(g_BgRenderMethods) /
+//                                   sizeof(g_BgRenderMethods[0]));
+//    if (regRet != JNI_TRUE)
+//    {
+//        return JNI_ERR;
+//    }
 
     return JNI_VERSION_1_6;
 }
