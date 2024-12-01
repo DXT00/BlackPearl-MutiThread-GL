@@ -1,5 +1,5 @@
 #pragma once
-
+#include "render/EGLRender.h"
 class Engine
 {
 public:
@@ -7,9 +7,14 @@ public:
 		static Engine singleton;
 		return &singleton;
 	}
-	static void Init();
+    void Init();
 	void Clear();
+    void DrawFrame();
 	void Exit();
 	bool ShouldExit();
+
+private:
+    EGLRender* eglRender = nullptr;
+
 };
 

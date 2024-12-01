@@ -24,6 +24,7 @@ Java_com_example_blackpearl_1multithread_1gl_1andriod_MainActivity_stringFromJNI
 extern "C" JNIEXPORT void JNICALL native_Init(JNIEnv *env, jobject instance)
 {
     Engine::GetInstance();
+    Engine::GetInstance()->Init();
 
 }
 
@@ -42,6 +43,8 @@ extern "C"
 JNIEXPORT void JNICALL
 native_OnDrawFrame(
         JNIEnv *env, jobject thiz) {
+        LOGCATE("native_OnDrawFrame");
+        Engine::GetInstance()->DrawFrame();
     // TODO: implement native_OnDrawFrame()
 }
 

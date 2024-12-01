@@ -3,6 +3,8 @@
 
 void Engine::Init()
 {
+    eglRender = new EGLRender();
+    eglRender->Init();
 }
 
 void Engine::Clear()
@@ -11,9 +13,14 @@ void Engine::Clear()
 
 void Engine::Exit()
 {
+    eglRender->UnInit();
 }
 
 bool Engine::ShouldExit()
 {
 	return false;
+}
+
+void Engine::DrawFrame() {
+    eglRender->Draw();
 }
