@@ -2,8 +2,8 @@
 #include "LogUtil.h"
 #include <stdlib.h>
 #include <cstring>
+//#include <GLES2/gl2ext.h>
 #include <GLES2/gl2ext.h>
-
 GLuint GLUtils::LoadShader(GLenum shaderType, const char *pSource)
 {
     GLuint shader = 0;
@@ -30,8 +30,12 @@ GLuint GLUtils::LoadShader(GLenum shaderType, const char *pSource)
                     }
                     glDeleteShader(shader);
                     shader = 0;
+                    LOGCATE("GLUtils::LoadShader Could not compile shader %d: , %s\n", shaderType, pSource);
                 }
             }
+        }else{
+
+            LOGCATE("GLUtils::LoadShader glCreateShader Could not compile shader %d: , %s\n", shaderType, pSource);
         }
 	FUN_END_TIME("GLUtils::LoadShader")
 	return shader;
@@ -42,9 +46,16 @@ GLuint GLUtils::CreateProgram(const char *pVertexShaderSource, const char *pFrag
     GLuint program = 0;
     FUN_BEGIN_TIME("GLUtils::CreateProgram")
         vertexShaderHandle = LoadShader(GL_VERTEX_SHADER, pVertexShaderSource);
-        if (!vertexShaderHandle) return program;
+        if (!vertexShaderHandle) {
+            LOGCATE("GLUtils::CreateProgram vertexShaderHandle = nullptr\n");
+
+            return program;
+        }
         fragShaderHandle = LoadShader(GL_FRAGMENT_SHADER, pFragShaderSource);
-        if (!fragShaderHandle) return program;
+        if (!fragShaderHandle) {
+            LOGCATE("GLUtils::CreateProgram fragShaderHandle = nullptr\n");
+            return program;
+        }
 
         program = glCreateProgram();
         if (program)
@@ -166,33 +177,33 @@ GLuint GLUtils::CreateProgram(const char *pVertexShaderSource, const char *pFrag
     return CreateProgram(pVertexShaderSource, pFragShaderSource, vertexShaderHandle, fragShaderHandle);
 }
 
-GLuint GLUtils::LoadComputeShader(const char* computeShaderSource) {
-    LOGCATE("GLUtils::LoadComputeShader Compute shader: %s", computeShaderSource);
-    GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
-    glShaderSource(computeShader, 1, &computeShaderSource, NULL);
-    glCompileShader(computeShader);
-
-    GLint success;
-    glGetShaderiv(computeShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        GLchar infoLog[512];
-        glGetShaderInfoLog(computeShader, 512, NULL, infoLog);
-        LOGCATE("GLUtils::LoadComputeShader Compute shader compilation failed: %s", infoLog);
-        return 0;
-    }
-
-    GLuint computeProgram = glCreateProgram();
-    glAttachShader(computeProgram, computeShader);
-    glLinkProgram(computeProgram);
-
-    glGetProgramiv(computeProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        GLchar infoLog[512];
-        glGetProgramInfoLog(computeProgram, 512, NULL, infoLog);
-        LOGCATE("GLUtils::LoadComputeShader Compute shader linking failed: %s", infoLog);
-        return 0;
-    }
-
-    glDeleteShader(computeShader);
-    return computeProgram;
-}
+//GLuint GLUtils::LoadComputeShader(const char* computeShaderSource) {
+//    LOGCATE("GLUtils::LoadComputeShader Compute shader: %s", computeShaderSource);
+//    GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
+//    glShaderSource(computeShader, 1, &computeShaderSource, NULL);
+//    glCompileShader(computeShader);
+//
+//    GLint success;
+//    glGetShaderiv(computeShader, GL_COMPILE_STATUS, &success);
+//    if (!success) {
+//        GLchar infoLog[512];
+//        glGetShaderInfoLog(computeShader, 512, NULL, infoLog);
+//        LOGCATE("GLUtils::LoadComputeShader Compute shader compilation failed: %s", infoLog);
+//        return 0;
+//    }
+//
+//    GLuint computeProgram = glCreateProgram();
+//    glAttachShader(computeProgram, computeShader);
+//    glLinkProgram(computeProgram);
+//
+//    glGetProgramiv(computeProgram, GL_LINK_STATUS, &success);
+//    if (!success) {
+//        GLchar infoLog[512];
+//        glGetProgramInfoLog(computeProgram, 512, NULL, infoLog);
+//        LOGCATE("GLUtils::LoadComputeShader Compute shader linking failed: %s", infoLog);
+//        return 0;
+//    }
+//
+//    glDeleteShader(computeShader);
+//    return computeProgram;
+//}

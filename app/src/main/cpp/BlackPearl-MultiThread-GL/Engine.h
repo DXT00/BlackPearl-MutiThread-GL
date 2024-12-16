@@ -12,9 +12,11 @@ public:
     void DrawFrame();
 	void Exit();
 	bool ShouldExit();
-
+    void OnSurfaceChanged(int width, int height);
+    void SetImageData(uint8_t *pData, int width, int height);
 private:
     EGLRender* eglRender = nullptr;
-
+    int m_ScreenW;
+    int m_ScreenH;
 };
 

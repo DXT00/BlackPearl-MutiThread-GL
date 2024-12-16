@@ -14,7 +14,7 @@ public class MyGLRender implements GLSurfaceView.Renderer {
     private static final String TAG = "MyGLRender";
     private MyNativeRender mNativeRender;
     private int mSampleType;
-
+    private Boolean inited = false;
     MyGLRender() {
         mNativeRender = new MyNativeRender();
     }
@@ -23,24 +23,31 @@ public class MyGLRender implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
        // mNativeRender.native_OnSurfaceCreated();
         Log.e(TAG, "onSurfaceCreated() called with: GL_VERSION = [" + gl.glGetString(GL10.GL_VERSION) + "]");
+        init();
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         //mNativeRender.native_OnSurfaceChanged(width, height);
         Log.e(TAG, "onSurfaceChanged() called with");
+        mNativeRender.native_OnSurfaceChanged(width, height);
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
         Log.e(TAG, "onDrawFrame() called with");
+        if(inited){
+            mNativeRender.native_OnDrawFrame();
+        }
 
-        mNativeRender.native_OnDrawFrame();
 
     }
 
     public void init() {
+        Log.e(TAG, "xxx init() called with");
+
         mNativeRender.native_Init();
+        inited = true;
     }
 
     public void unInit() {
@@ -63,8 +70,8 @@ public class MyGLRender implements GLSurfaceView.Renderer {
         mNativeRender.native_SetParamsFloat(SAMPLE_TYPE_SET_GRAVITY_XY, x, y);
     }
 
-    public void setImageData(int format, int width, int height, byte[] bytes) {
-        mNativeRender.native_SetImageData(format, width, height, bytes);
+    public void setImageData(byte[] data, int width, int height) {
+        mNativeRender.native_SetImageData(data, width, height);
     }
 
     public void setImageDataWithIndex(int index, int format, int width, int height, byte[] bytes) {

@@ -9,8 +9,8 @@
 #include <util/ImageDef.h>
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
+//#include <GLES2/gl2.h>
+//#include <GLES2/gl2ext.h>
 
 #define EGL_FEATURE_NUM 7
 
@@ -61,8 +61,8 @@ private:
 	GLuint m_ImageTextureId;
 	GLuint m_FboTextureId;
 	GLuint m_FboId;
-	GLuint m_VaoIds[1] = {GL_NONE};;
-	GLuint m_VboIds[3] = {GL_NONE};;
+    GLuint  m_VaoId;
+    GLuint  m_VboIds[2];
 	GLint m_SamplerLoc;
 	GLint m_TexSizeLoc;
 	NativeImage m_RenderImage;

@@ -70,6 +70,12 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    ndkVersion '21.1.6352462'
+    buildToolsVersion '34.0.0'
+    dependenciesInfo {
+        includeInApk true
+        includeInBundle true
+    }
 }
 
 dependencies {

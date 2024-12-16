@@ -10,17 +10,23 @@
 #define TEXTURE_POS_LOC 1
 
 EGLRender *EGLRender::m_Instance = nullptr;
+#define VERTEX_POS_SIZE       3 // x, y and z
+#define VERTEX_COLOR_SIZE     4 // r, g, b, and a
 
+#define VERTEX_POS_INDX       0 //shader layout loc
+#define VERTEX_COLOR_INDX     1 //shader layout loc
+
+#define VERTEX_STRIDE         (sizeof(GLfloat)*(VERTEX_POS_SIZE+VERTEX_COLOR_SIZE))
 #define PARAM_TYPE_SHADER_INDEX    200
 
 const char vShaderStr[] =
 		"#version 300 es                            \n"
-		"layout(location = 0) in vec4 a_position;   \n"
+		"layout(location = 0) in vec3 a_position;   \n"
 		"layout(location = 1) in vec2 a_texCoord;   \n"
 		"out vec2 v_texCoord;                       \n"
 		"void main()                                \n"
 		"{                                          \n"
-		"   gl_Position = a_position;               \n"
+		"   gl_Position = vec4(a_position,1.0);               \n"
 		"   v_texCoord = a_texCoord;                \n"
 		"}                                          \n";
 
@@ -29,10 +35,9 @@ const char fShaderStr0[] =
 		"precision mediump float;\n"
 		"in vec2 v_texCoord;\n"
 		"layout(location = 0) out vec4 outColor;\n"
-		"uniform sampler2D s_TextureMap;\n"
 		"void main()\n"
 		"{\n"
-		"    outColor = texture(s_TextureMap, v_texCoord);\n"
+		"    outColor = vec4(1,0,0,0);\n"
 		"}";
 // 马赛克
 const char fShaderStr1[] =
@@ -317,6 +322,7 @@ EGLRender::EGLRender()
 
 	m_IsGLContextReady = false;
 	m_ShaderIndex = 0;
+    m_VaoId = 0;
 }
 
 EGLRender::~EGLRender()
@@ -331,83 +337,97 @@ EGLRender::~EGLRender()
 
 void EGLRender::Init()
 {
-	LOGCATE("EGLRender::Init");
-	if (CreateGlesEnv() == 0)
-	{
-		m_IsGLContextReady = true;
-	}
-
-	if(!m_IsGLContextReady) return;
-	m_fShaderStrs[0] = fShaderStr0;
-	m_fShaderStrs[1] = fShaderStr1;
-	m_fShaderStrs[2] = fShaderStr2;
-	m_fShaderStrs[3] = fShaderStr3;
-	m_fShaderStrs[4] = fShaderStr4;
-	m_fShaderStrs[5] = fShaderStr5;
-	m_fShaderStrs[6] = fShaderStr7;
-
-
-	glGenTextures(1, &m_ImageTextureId);
-	glBindTexture(GL_TEXTURE_2D, m_ImageTextureId);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, GL_NONE);
-
-	glGenTextures(1, &m_FboTextureId);
-	glBindTexture(GL_TEXTURE_2D, m_FboTextureId);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, GL_NONE);
+    LOGCATE("EGLRender::Init");
+//    if (CreateGlesEnv() == 0)
+//    {
+//        m_IsGLContextReady = true;
+//        LOGCATE("[dxt00] CreateGlesEnv success");
+//    }
+//
+//    if(!m_IsGLContextReady) {
+//        LOGCATE("[dxt00] CreateGlesEnv failed");
+//
+//        return;
+//    }
+    const char vShaderStr[] =
+            "#version 300 es                            \n"
+            "layout(location = 0) in vec4 a_position;   \n"
+            "layout(location = 1) in vec4 a_color;      \n"
+            "out vec4 v_color;                          \n"
+            "out vec4 v_position;                       \n"
+            "void main()                                \n"
+            "{                                          \n"
+            "    v_color = a_color;                     \n"
+            "    gl_Position = a_position;              \n"
+            "    v_position = a_position;               \n"
+            "}";
 
 
-	m_ProgramObj = GLUtils::CreateProgram(vShaderStr, m_fShaderStrs[m_ShaderIndex], m_VertexShader,
-									 m_FragmentShader);
-	if (!m_ProgramObj)
-	{
-		GLUtils::CheckGLError("Create Program");
-		LOGCATE("EGLRender::Init Could not create program.");
-		return;
-	}
+    const char fShaderStr[] =
+            "#version 300 es\n"
+            "precision mediump float;\n"
+            "in vec4 v_color;\n"
+            "in vec4 v_position;\n"
+            "out vec4 o_fragColor;\n"
+            "void main()\n"
+            "{\n"
+            "    float n = 10.0;\n"
+            "    float span = 1.0 / n;\n"
+            "    int i = int((v_position.x + 0.5)/span);\n"
+            "    int j = int((v_position.y + 0.5)/span);\n"
+            "\n"
+            "    int grayColor = int(mod(float(i+j), 2.0));\n"
+            "    if(grayColor == 1)\n"
+            "    {\n"
+            "        float luminance = v_color.r*0.299 + v_color.g*0.587 + v_color.b*0.114;\n"
+            "        o_fragColor = vec4(1.0,1.0,0.0,0.5);\n"
+            "    }\n"
+            "    else\n"
+            "    {\n"
+            "        o_fragColor =  vec4(1.0,1.0,0.0,0.5);\n"
+            "    }\n"
+            "}";
+//v_color;
+    // 4 vertices, with(x,y,z) ,(r, g, b, a) per-vertex
+    GLfloat vertices[4 *(VERTEX_POS_SIZE + VERTEX_COLOR_SIZE )] =
+            {
+                    -0.5f,  0.5f, 0.0f,       // v0
+                    1.0f,  0.0f, 0.0f, 1.0f,  // c0
+                    -0.5f, -0.5f, 0.0f,       // v1
+                    0.0f,  1.0f, 0.0f, 1.0f,  // c1
+                    0.5f, -0.5f, 0.0f,        // v2
+                    0.0f,  0.0f, 1.0f, 1.0f,  // c2
+                    0.5f,  0.5f, 0.0f,        // v3
+                    0.5f,  1.0f, 1.0f, 1.0f,  // c3
+            };
+    // Index buffer data
+    GLushort indices[6] = { 0, 1, 2, 0, 2, 3};
 
-	m_SamplerLoc = glGetUniformLocation(m_ProgramObj, "s_TextureMap");
-	m_TexSizeLoc = glGetUniformLocation(m_ProgramObj, "u_texSize");
+    m_ProgramObj = GLUtils::CreateProgram(vShaderStr, fShaderStr, m_VertexShader, m_FragmentShader);
 
-	// Generate VBO Ids and load the VBOs with data
-	glGenBuffers(3, m_VboIds);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vVertices), vVertices, GL_STATIC_DRAW);
+    // Generate VBO Ids and load the VBOs with data
+    glGenBuffers(2, m_VboIds);
+    glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vFboTexCoors), vTexCoors, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_VboIds[1]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_VboIds[2]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    // Generate VAO Id
+    glGenVertexArrays(1, &m_VaoId);
+    glBindVertexArray(m_VaoId);
 
-	GO_CHECK_GL_ERROR();
+    glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[0]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_VboIds[1]);
 
-	// Generate VAO Ids
-	glGenVertexArrays(1, m_VaoIds);
+    glEnableVertexAttribArray(VERTEX_POS_INDX);
+    glEnableVertexAttribArray(VERTEX_COLOR_INDX);
 
-	// FBO off screen rendering VAO
-	glBindVertexArray(m_VaoIds[0]);
+    glVertexAttribPointer(VERTEX_POS_INDX, VERTEX_POS_SIZE, GL_FLOAT, GL_FALSE, VERTEX_STRIDE, (const void *)0);
+    glVertexAttribPointer(VERTEX_COLOR_INDX, VERTEX_COLOR_SIZE, GL_FLOAT, GL_FALSE, VERTEX_STRIDE, (const void *)(VERTEX_POS_SIZE *sizeof(GLfloat)));
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[0]);
-	glEnableVertexAttribArray(VERTEX_POS_LOC);
-	glVertexAttribPointer(VERTEX_POS_LOC, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (const void *)0);
-	glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[1]);
-	glEnableVertexAttribArray(TEXTURE_POS_LOC);
-	glVertexAttribPointer(TEXTURE_POS_LOC, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (const void *)0);
-	glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_VboIds[2]);
-	GO_CHECK_GL_ERROR();
-	glBindVertexArray(GL_NONE);
+    glBindVertexArray(GL_NONE);
+    //glBindVertexArray(GL_NONE);
 }
 
 int EGLRender::CreateGlesEnv()
@@ -592,7 +612,7 @@ void EGLRender::SetIntParams(int paramType, int param)
 					m_ProgramObj = GL_NONE;
 				}
 
-				m_ProgramObj = GLUtils::CreateProgram(vShaderStr, m_fShaderStrs[m_ShaderIndex], m_VertexShader,
+				m_ProgramObj = GLUtils::CreateProgram(vShaderStr, m_fShaderStrs[0], m_VertexShader,
 													  m_FragmentShader);
 				if (!m_ProgramObj)
 				{
@@ -613,90 +633,121 @@ void EGLRender::SetIntParams(int paramType, int param)
 			break;
 	}
 }
-
+//void EGLRender::OnSurfaceCreated()
+//{
+//    LOGCATE("MyGLRenderContext::OnSurfaceCreated");
+//    glClearColor(1.0f,1.0f,1.0f, 1.0f);
+//}
+//
+//void EGLRender::OnSurfaceChanged(int width, int height)
+//{
+//    LOGCATE("MyGLRenderContext::OnSurfaceChanged [w, h] = [%d, %d]", width, height);
+//    glViewport(0, 0, width, height);
+//    m_ScreenW = width;
+//    m_ScreenH = height;
+//}
 void EGLRender::Draw()
 {
-	LOGCATE("EGLRender::Draw");
-	if (m_ProgramObj == GL_NONE) return;
-	glViewport(0, 0, m_RenderImage.width, m_RenderImage.height);
+//	LOGCATE("EGLRender::Draw");
+//	if (m_ProgramObj == GL_NONE) return;
+//    glViewport(0, 0, m_RenderImage.width, m_RenderImage.height);
+////    glViewport(0, 0, 200, 300);
+////
+////	// Do FBO off screen rendering
+//	//glUseProgram(m_ProgramObj);
+//    glBindFramebuffer(GL_FRAMEBUFFER, m_FboId);
+////
+//	glBindVertexArray(m_VaoIds[0]);
+//////	glActiveTexture(GL_TEXTURE0);
+//////	glBindTexture(GL_TEXTURE_2D, m_ImageTextureId);
+//////	glUniform1i(m_SamplerLoc, 0);
+//////
+//////	if (m_TexSizeLoc > -1) {
+//////		GLfloat size[2];
+//////		size[0] = m_RenderImage.width;
+//////		size[1] = m_RenderImage.height;
+//////		glUniform2f(m_TexSizeLoc, size[0], size[1]);
+//////	}
+////
+////
+////	//7. 渲染
+////	GO_CHECK_GL_ERROR();
+//	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (const void *)0);
+////	GO_CHECK_GL_ERROR();
+//	glBindVertexArray(GL_NONE);
+//	glBindTexture(GL_TEXTURE_2D, GL_NONE);
+//
+//	//一旦解绑 FBO 后面就不能调用 readPixels
+//	//glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
 
-	// Do FBO off screen rendering
-	glUseProgram(m_ProgramObj);
-	glBindFramebuffer(GL_FRAMEBUFFER, m_FboId);
+    LOGCATE("MyGLRenderContext::OnDrawFrame");
+//    glClearColor(0.0f,0.0f,1.0f, 1.0f);
+//    glViewport(0, 0,1920, 1080);
+//    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-	glBindVertexArray(m_VaoIds[0]);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_ImageTextureId);
-	glUniform1i(m_SamplerLoc, 0);
+    if(m_ProgramObj == 0) return;
+    LOGCATE("[dxt00]EGLRender::glUseProgram(m_ProgramObj);");
+    glUseProgram(m_ProgramObj);
+    LOGCATE("[dxt00]EGLRender::glBindVertexArray(m_VaoId);");
 
-	if (m_TexSizeLoc > -1) {
-		GLfloat size[2];
-		size[0] = m_RenderImage.width;
-		size[1] = m_RenderImage.height;
-		glUniform2f(m_TexSizeLoc, size[0], size[1]);
-	}
+    glBindVertexArray(m_VaoId);
 
+    // Draw with the VAO settings
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (const void *)0);
 
-	//7. 渲染
-	GO_CHECK_GL_ERROR();
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (const void *)0);
-	GO_CHECK_GL_ERROR();
-	glBindVertexArray(GL_NONE);
-	glBindTexture(GL_TEXTURE_2D, GL_NONE);
-
-	//一旦解绑 FBO 后面就不能调用 readPixels
-	//glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
+    // Return to the default VAO
+    glBindVertexArray(GL_NONE);
 
 }
 
 void EGLRender::UnInit()
 {
-	LOGCATE("EGLRender::UnInit");
-	if (m_ProgramObj)
-	{
-		glDeleteProgram(m_ProgramObj);
-		m_ProgramObj = GL_NONE;
-	}
-
-	if (m_ImageTextureId)
-	{
-		glDeleteTextures(1, &m_ImageTextureId);
-		m_ImageTextureId = GL_NONE;
-	}
-
-	if (m_FboTextureId)
-	{
-		glDeleteTextures(1, &m_FboTextureId);
-		m_FboTextureId = GL_NONE;
-	}
-
-	if (m_VboIds[0])
-	{
-		glDeleteBuffers(3, m_VboIds);
-		m_VboIds[0] = GL_NONE;
-		m_VboIds[1] = GL_NONE;
-		m_VboIds[2] = GL_NONE;
-
-	}
-
-	if (m_VaoIds[0])
-	{
-		glDeleteVertexArrays(1, m_VaoIds);
-		m_VaoIds[0] = GL_NONE;
-	}
-
-	if (m_FboId)
-	{
-		glDeleteFramebuffers(1, &m_FboId);
-		m_FboId = GL_NONE;
-	}
-
-
-	if (m_IsGLContextReady)
-	{
-		DestroyGlesEnv();
-		m_IsGLContextReady = false;
-	}
+//	LOGCATE("EGLRender::UnInit");
+//	if (m_ProgramObj)
+//	{
+//		glDeleteProgram(m_ProgramObj);
+//		m_ProgramObj = GL_NONE;
+//	}
+//
+//	if (m_ImageTextureId)
+//	{
+//		glDeleteTextures(1, &m_ImageTextureId);
+//		m_ImageTextureId = GL_NONE;
+//	}
+//
+//	if (m_FboTextureId)
+//	{
+//		glDeleteTextures(1, &m_FboTextureId);
+//		m_FboTextureId = GL_NONE;
+//	}
+//
+//	if (m_VboIds[0])
+//	{
+//		glDeleteBuffers(3, m_VboIds);
+//		m_VboIds[0] = GL_NONE;
+//		m_VboIds[1] = GL_NONE;
+//		m_VboIds[2] = GL_NONE;
+//
+//	}
+//
+//	if (m_VaoIds[0])
+//	{
+//		glDeleteVertexArrays(1, m_VaoIds);
+//		m_VaoIds[0] = GL_NONE;
+//	}
+//
+//	if (m_FboId)
+//	{
+//		glDeleteFramebuffers(1, &m_FboId);
+//		m_FboId = GL_NONE;
+//	}
+//
+//
+//	if (m_IsGLContextReady)
+//	{
+//		DestroyGlesEnv();
+//		m_IsGLContextReady = false;
+//	}
 
 }
 

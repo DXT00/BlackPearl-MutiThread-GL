@@ -90,7 +90,7 @@ public class MyNativeRender {
 
     public native void native_UpdateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY);
 
-    public native void native_SetImageData(int format, int width, int height, byte[] bytes);
+    public native void native_SetImageData(byte[] bytes, int width, int height);
 
     public native void native_SetImageDataWithIndex(int index, int format, int width, int height, byte[] bytes);
 
