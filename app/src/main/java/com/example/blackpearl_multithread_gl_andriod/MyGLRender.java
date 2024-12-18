@@ -22,14 +22,14 @@ public class MyGLRender implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
        // mNativeRender.native_OnSurfaceCreated();
-        Log.e(TAG, "onSurfaceCreated() called with: GL_VERSION = [" + gl.glGetString(GL10.GL_VERSION) + "]");
+        Log.e(TAG, "[dxt00] onSurfaceCreated() called with: GL_VERSION = [" + gl.glGetString(GL10.GL_VERSION) + "]");
         init();
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         //mNativeRender.native_OnSurfaceChanged(width, height);
-        Log.e(TAG, "onSurfaceChanged() called with");
+        //Log.e(TAG, "[dxt00]  onSurfaceChanged() called with" + width + height);
         mNativeRender.native_OnSurfaceChanged(width, height);
     }
 

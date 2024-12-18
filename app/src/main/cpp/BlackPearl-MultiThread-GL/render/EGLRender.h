@@ -24,11 +24,10 @@ public:
 
     int CreateGlesEnv();
 
-    //void CreateProgramWithFeedback(const char *vShaderStr, const char *fShaderStr);
-
     void SetImageData(uint8_t *pData, int width, int height);
 
-    void SetIntParams(int paramType, int param);
+    void OnSurfaceCreated();
+    void OnSurfaceChanged(int width, int height);
 
     void Draw();
 
@@ -63,8 +62,7 @@ private:
 	GLuint m_FboId;
     GLuint  m_VaoId;
     GLuint  m_VboIds[2];
-	GLint m_SamplerLoc;
-	GLint m_TexSizeLoc;
+
 	NativeImage m_RenderImage;
 	GLuint m_ProgramObj;
 	GLuint m_VertexShader;
@@ -75,8 +73,10 @@ private:
 	EGLContext m_eglCtx;
 	EGLDisplay m_eglDisplay;
 	bool       m_IsGLContextReady;
-	const char*m_fShaderStrs[EGL_FEATURE_NUM];
-	int        m_ShaderIndex;
+
+    int m_ScreenW;
+    int m_ScreenH;
+
 };
 
 
