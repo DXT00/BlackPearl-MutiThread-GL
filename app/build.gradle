@@ -41,6 +41,13 @@ android {
             minifyEnabled false
         }
     }
+    task wrapper(type: Wrapper){
+        gradleVersion = '8.4'
+    }
+
+    task prepareKotlinBuildScriptModel {
+
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
