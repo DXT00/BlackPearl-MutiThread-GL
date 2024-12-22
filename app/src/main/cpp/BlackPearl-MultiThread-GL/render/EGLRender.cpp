@@ -1,6 +1,4 @@
-//
-// Created by ByteFlow on 2019/7/17.
-//
+
 
 #include <util/LogUtil.h>
 #include <util/GLUtils.h>

@@ -1,6 +1,3 @@
-//
-// Created by ByteFlow on 2019/7/15.
-//
 
 #include "Looper.h"
 

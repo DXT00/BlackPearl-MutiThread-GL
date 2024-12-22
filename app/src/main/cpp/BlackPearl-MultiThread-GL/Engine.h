@@ -1,5 +1,7 @@
 #pragma once
+#include "render/BasicRenderer.h"
 #include "render/EGLRender.h"
+#include "render/SharedEGLContextRenderer.h"
 class Engine
 {
 public:
@@ -15,7 +17,8 @@ public:
     void OnSurfaceChanged(int width, int height);
     void SetImageData(uint8_t *pData, int width, int height);
 private:
-    EGLRender* eglRender = nullptr;
+    BasicRenderer* eglRender = nullptr;
+
     int m_ScreenW;
     int m_ScreenH;
 };

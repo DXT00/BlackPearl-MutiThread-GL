@@ -1,6 +1,3 @@
-//
-// Created by ByteFlow on 2019/7/17.
-//
 
 #ifndef NDK_OPENGLES_3_0_BGRENDER_H
 #define NDK_OPENGLES_3_0_BGRENDER_H
@@ -9,31 +6,30 @@
 #include <util/ImageDef.h>
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
-//#include <GLES2/gl2.h>
-//#include <GLES2/gl2ext.h>
+#include "BasicRenderer.h"
 
 #define EGL_FEATURE_NUM 7
 
-class EGLRender
+class EGLRender : public  BasicRenderer
 {
 public:
 	EGLRender();
 	~EGLRender();
 
-    void Init();
+    void Init() override;
+    void OnSurfaceChanged(int width, int height) override;
+    void Draw() override;
+    void UnInit() override;
 
     int CreateGlesEnv();
 
     void SetImageData(uint8_t *pData, int width, int height);
 
     void OnSurfaceCreated();
-    void OnSurfaceChanged(int width, int height);
 
-    void Draw();
 
     void DestroyGlesEnv();
 
-    void UnInit();
 
     static EGLRender* GetInstance()
 	{
@@ -74,8 +70,7 @@ private:
 	EGLDisplay m_eglDisplay;
 	bool       m_IsGLContextReady;
 
-    int m_ScreenW;
-    int m_ScreenH;
+
 
 };
 

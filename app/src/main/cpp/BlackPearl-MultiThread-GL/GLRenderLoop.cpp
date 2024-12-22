@@ -23,7 +23,7 @@ void GLRenderLooper::handleMessage(LooperMessage* msg) {
         m_GLEnv = (GLEnv*)msg->obj;
         OnSurfaceCreated();
     }
-                           break;
+         break;
     case MSG_SurfaceChanged:
         printf("GLRenderLooper::handleMessage MSG_SurfaceChanged");
         OnSurfaceChanged(msg->arg1, msg->arg2);
@@ -100,6 +100,7 @@ void GLRenderLooper::OnSurfaceChanged(int w, int h) {
 
 void GLRenderLooper::OnDrawFrame() {
     printf("GLRenderLooper::OnDrawFrame");
+    LOGCATE("GLRenderLooper::OnDrawFrame");
     SizeF imgSizeF = m_GLEnv->imgSize;
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_FboId);

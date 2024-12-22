@@ -1,9 +1,11 @@
-#include "D:/AA_LEARN_CODING/LearnOpenGL/BlackPearl-MutiThread-GL/build/CMakeFiles/BlackPearl-MultiThread-GL.dir/Debug/cmake_pch.hxx"
+//#include "D:/AA_LEARN_CODING/LearnOpenGL/BlackPearl-MutiThread-GL/build/CMakeFiles/BlackPearl-MultiThread-GL.dir/Debug/cmake_pch.hxx"
 #include "Engine.h"
 
 void Engine::Init()
 {
-    eglRender = new EGLRender();
+    //eglRender = new EGLRender();
+    eglRender = new SharedEGLContextRenderer();
+
     eglRender->Init();
 }
 
@@ -29,5 +31,5 @@ void Engine::DrawFrame() {
     eglRender->Draw();
 }
 void Engine::SetImageData(uint8_t *pData, int width, int height){
-    eglRender->SetImageData(pData, width, height);
+   // eglRender->SetImageData(pData, width, height);
 }

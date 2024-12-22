@@ -3,6 +3,7 @@
 #include "GLES3/gl3.h"
 #include "egl/EglCore.h"
 #include "egl/OffscreenSurface.h"
+#include "util/ImageDef.h"
 #include <mutex>
 enum {
     MSG_SurfaceCreated,
@@ -13,13 +14,6 @@ enum {
 
 typedef void (*RenderDoneCallback)(void*, int);
 
-struct SizeF {
-    float width;
-    float height;
-    SizeF() {
-        width = height = 0;
-    }
-};
 
 struct GLEnv {
     GLuint inputTexId;
