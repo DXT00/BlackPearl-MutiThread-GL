@@ -23,7 +23,7 @@ public:
 
     int CreateGlesEnv();
 
-    void SetImageData(uint8_t *pData, int width, int height);
+    void SetImageData(uint8_t *pData, int width, int height) override;
 
     void OnSurfaceCreated();
 

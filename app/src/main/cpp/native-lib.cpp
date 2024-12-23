@@ -38,24 +38,10 @@ extern "C" JNIEXPORT void JNICALL native_UnInit(JNIEnv *env, jobject instance)
     //Engine::DestroyInstance();
 }
 
-/*
- * Class:     com_byteflow_app_egl_NativeBgRender
- * Method:    native_EglRenderSetImageData
- * Signature: ([BII)V
- */
-JNIEXPORT void JNICALL native_SetImageData(JNIEnv *env, jobject instance, jbyteArray data, jint width, jint height)
-{
-    int len = env->GetArrayLength (data);
-    uint8_t* buf = new uint8_t[len];
-    env->GetByteArrayRegion(data, 0, len, reinterpret_cast<jbyte*>(buf));
-    //TODO::
-    Engine::GetInstance()->SetImageData(buf, width, height);
-    delete[] buf;
-    env->DeleteLocalRef(data);
 
-
-}
-extern "C"
+#ifdef __cplusplus
+extern "C" {
+#endif
 JNIEXPORT void JNICALL
 native_OnDrawFrame(
         JNIEnv *env, jobject thiz) {
@@ -69,6 +55,7 @@ native_OnDrawFrame(
  * Method:    native_OnSurfaceChanged
  * Signature: (II)V
  */
+
 JNIEXPORT void JNICALL native_OnSurfaceChanged
         (JNIEnv *env, jobject instance, jint width, jint height)
 {
@@ -76,13 +63,34 @@ JNIEXPORT void JNICALL native_OnSurfaceChanged
 
 }
 
+/*
+ * Class:     com_byteflow_app_egl_NativeBgRender
+ * Method:    native_EglRenderSetImageData
+ * Signature: ([BII)V
+ */
+
+JNIEXPORT void JNICALL native_SetImageData(JNIEnv *env, jobject instance, jint format, jint width, jint height, jbyteArray data)
+{
+    int len = env->GetArrayLength (data);
+    uint8_t* buf = new uint8_t[len];
+    env->GetByteArrayRegion(data, 0, len, reinterpret_cast<jbyte*>(buf));
+    //TODO::
+    Engine::GetInstance()->SetImageData(format, buf, width, height);
+    delete[] buf;
+    env->DeleteLocalRef(data);
+
+
+}
+#ifdef __cplusplus
+}
+#endif
+
 static JNINativeMethod g_RenderMethods[] = {
         {"native_Init",                      "()V",       (void *)(native_Init)},
         {"native_UnInit",                    "()V",       (void *)(native_UnInit)},
         {"native_OnDrawFrame",               "()V",       (void *)(native_OnDrawFrame)},
         {"native_OnSurfaceChanged",          "(II)V",     (void *)(native_OnSurfaceChanged)},
-        {"native_SetImageData",  "([BII)V",   (void *)(native_SetImageData)},
-
+        {"native_SetImageData",              "(III[B)V",  (void *)(native_SetImageData)},
 };
 
 static int RegisterNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int methodNum)

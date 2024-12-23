@@ -187,6 +187,10 @@ void SharedEGLContextRenderer::Init()
      GLRenderLooper::GetInstance()->postMessage(MSG_SurfaceChanged, m_RenderImage.width, m_RenderImage.height);
 
  }
+
+void SharedEGLContextRenderer::SetImageData(uint8_t *pData, int width, int height){
+
+}
 void SharedEGLContextRenderer::Draw()
 {
 	LOGCATE("SharedEGLContextSample::Draw");

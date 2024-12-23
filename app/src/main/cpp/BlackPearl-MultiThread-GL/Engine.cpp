@@ -30,6 +30,28 @@ void Engine::OnSurfaceChanged(int width, int height)
 void Engine::DrawFrame() {
     eglRender->Draw();
 }
-void Engine::SetImageData(uint8_t *pData, int width, int height){
-   // eglRender->SetImageData(pData, width, height);
+void Engine::SetImageData(int format, uint8_t *pData, int width, int height){
+    LOGCATE("MyGLRenderContext::SetImageData format=%d, width=%d, height=%d, pData=%p", format, width, height, pData);
+    NativeImage nativeImage;
+    nativeImage.format = format;
+    nativeImage.width = width;
+    nativeImage.height = height;
+    nativeImage.ppPlane[0] = pData;
+
+    switch (format)
+    {
+        case IMAGE_FORMAT_NV12:
+        case IMAGE_FORMAT_NV21:
+            nativeImage.ppPlane[1] = nativeImage.ppPlane[0] + width * height;
+            break;
+        case IMAGE_FORMAT_I420:
+            nativeImage.ppPlane[1] = nativeImage.ppPlane[0] + width * height;
+            nativeImage.ppPlane[2] = nativeImage.ppPlane[1] + width * height / 4;
+            break;
+        default:
+            break;
+    }
+
+
+    eglRender->LoadImage(&nativeImage);
 }

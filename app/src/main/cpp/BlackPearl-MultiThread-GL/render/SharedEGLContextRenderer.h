@@ -16,13 +16,13 @@ public:
 
 	virtual ~SharedEGLContextRenderer();
 
-	virtual void LoadImage(NativeImage *pImage);
+	virtual void LoadImage(NativeImage *pImage) override;
 
 	virtual void Init() override;
 	virtual void Draw() override;
     virtual void UnInit() override;
     virtual void OnSurfaceChanged(int width, int height) override;
-
+    virtual void SetImageData(uint8_t *pData, int width, int height) override;
 
 	static void OnAsyncRenderDone(void* callback, int fboTexId);
 

@@ -15,7 +15,7 @@ public:
 	void Exit();
 	bool ShouldExit();
     void OnSurfaceChanged(int width, int height);
-    void SetImageData(uint8_t *pData, int width, int height);
+    void SetImageData(int format, uint8_t *pData, int width, int height);
 private:
     BasicRenderer* eglRender = nullptr;
 

@@ -23,7 +23,12 @@ import static android.opengl.GLSurfaceView.RENDERMODE_WHEN_DIRTY;
 import javax.microedition.khronos.opengles.GL10;
 import android.view.ViewTreeObserver;
 import static com.example.blackpearl_multithread_gl_andriod.MyNativeRender.SAMPLE_TYPE;
-
+import static com.example.blackpearl_multithread_gl_andriod.MySurfaceView.IMAGE_FORMAT_GARY;
+import static com.example.blackpearl_multithread_gl_andriod.MySurfaceView.IMAGE_FORMAT_I420;
+import static com.example.blackpearl_multithread_gl_andriod.MySurfaceView.IMAGE_FORMAT_I444;
+import static com.example.blackpearl_multithread_gl_andriod.MySurfaceView.IMAGE_FORMAT_NV21;
+import static com.example.blackpearl_multithread_gl_andriod.MySurfaceView.IMAGE_FORMAT_RGBA;
+import static com.example.blackpearl_multithread_gl_andriod.MySurfaceView.IMAGE_FORMAT_YUYV;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -85,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
                             || mRootView.getHeight() != mGLSurfaceView.getHeight()) {
                         mGLSurfaceView.setAspectRatio(mRootView.getWidth(), mRootView.getHeight());
                     }
-                    //loadRGBAImage(R.drawable.ic_launcher_foreground, mGLRender);
+                    loadRGBAImage(R.drawable.ic_launcher_foreground, mGLRender);
                     mGLSurfaceView.requestRender();
                    // mImageView.setImageBitmap(createBitmapFromGLSurface(0, 0, 933, 1400));
 
@@ -136,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
                 ByteBuffer buf = ByteBuffer.allocate(bytes);
                 bitmap.copyPixelsToBuffer(buf);
                 byte[] byteArray = buf.array();
-                render.setImageData(byteArray, bitmap.getWidth(), bitmap.getHeight());
+                render.setImageData(IMAGE_FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(),byteArray);
             }
         }
         finally

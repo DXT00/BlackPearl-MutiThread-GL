@@ -31,7 +31,8 @@ public:
 	virtual void Draw() = 0;
     virtual void OnSurfaceChanged(int width, int height) = 0;
     virtual void UnInit() = 0;
-
+    virtual void SetImageData(uint8_t *pData, int width, int height) {}
+    virtual void LoadImage(NativeImage *pImage){};
 protected:
 
     int m_ScreenW;
