@@ -19,21 +19,21 @@ void GLRenderLooper::handleMessage(LooperMessage* msg) {
     Looper::handleMessage(msg);
     switch (msg->what) {
     case MSG_SurfaceCreated: {
-        printf("GLRenderLooper::handleMessage MSG_SurfaceCreated");
+        LOGCATE("GLRenderLooper::handleMessage MSG_SurfaceCreated");
         m_GLEnv = (GLEnv*)msg->obj;
         OnSurfaceCreated();
     }
          break;
     case MSG_SurfaceChanged:
-        printf("GLRenderLooper::handleMessage MSG_SurfaceChanged");
+        LOGCATE("GLRenderLooper::handleMessage MSG_SurfaceChanged");
         OnSurfaceChanged(msg->arg1, msg->arg2);
         break;
     case MSG_DrawFrame:
-        printf("GLRenderLooper::handleMessage MSG_DrawFrame");
+        LOGCATE("GLRenderLooper::handleMessage MSG_DrawFrame");
         OnDrawFrame();
         break;
     case MSG_SurfaceDestroyed:
-        printf("GLRenderLooper::handleMessage MSG_SurfaceDestroyed");
+        LOGCATE("GLRenderLooper::handleMessage MSG_SurfaceChanged");
         OnSurfaceDestroyed();
         break;
     default:
@@ -65,7 +65,8 @@ void GLRenderLooper::ReleaseInstance() {
 }
 
 void GLRenderLooper::OnSurfaceCreated() {
-    printf("GLRenderLooper::OnSurfaceCreated");
+    LOGCATE("GLRenderLooper::OnSurfaceCreated");
+
     m_EglCore = new EglCore(m_GLEnv->sharedCtx, FLAG_RECORDABLE);
     SizeF imgSizeF = m_GLEnv->imgSize;
     m_OffscreenSurface = new OffscreenSurface(m_EglCore, imgSizeF.width, imgSizeF.height);
@@ -101,6 +102,10 @@ void GLRenderLooper::OnSurfaceChanged(int w, int h) {
 void GLRenderLooper::OnDrawFrame() {
     printf("GLRenderLooper::OnDrawFrame");
     LOGCATE("GLRenderLooper::OnDrawFrame");
+    if(!m_GLEnv){
+        LOGCATE("GLRenderLooper::OnDrawFrame m_GLEnv = nullptr");
+        return;
+    }
     SizeF imgSizeF = m_GLEnv->imgSize;
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_FboId);
@@ -115,8 +120,10 @@ void GLRenderLooper::OnDrawFrame() {
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (const void*)0);
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
+    LOGCATE("GLRenderLooper:: before m_OffscreenSurface->swapBuffers");
     m_OffscreenSurface->swapBuffers();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    LOGCATE("GLRenderLooper:: after m_OffscreenSurface->swapBuffers");
 
     m_GLEnv->renderDone(m_GLEnv->callbackCtx, m_FboTextureId);
     m_FrameIndex++;

@@ -18,7 +18,8 @@ public:
     void SetImageData(int format, uint8_t *pData, int width, int height);
 private:
     BasicRenderer* eglRender = nullptr;
-
+    NativeImage *pNativeImage = nullptr;
+    bool rendererInit = false;
     int m_ScreenW;
     int m_ScreenH;
 };

@@ -83,17 +83,17 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
 //                    mGLSurfaceView = new MySurfaceView(MainActivity.this, mGLRender);
 //                    mRootView.addView(mGLSurfaceView, lp);
 //
-                    mGLSurfaceView.setRenderMode(RENDERMODE_CONTINUOUSLY);
+                    //mGLSurfaceView.setRenderMode(RENDERMODE_CONTINUOUSLY);
                     //mGLRender.setParamsInt(SAMPLE_TYPE, position + SAMPLE_TYPE, 0);
 
                     if (mRootView.getWidth() != mGLSurfaceView.getWidth()
                             || mRootView.getHeight() != mGLSurfaceView.getHeight()) {
                         mGLSurfaceView.setAspectRatio(mRootView.getWidth(), mRootView.getHeight());
                     }
+                    mGLRender.beginDraw = true;
                     loadRGBAImage(R.drawable.ic_launcher_foreground, mGLRender);
                     mGLSurfaceView.requestRender();
-                   // mImageView.setImageBitmap(createBitmapFromGLSurface(0, 0, 933, 1400));
-
+                    mGLSurfaceView.setRenderMode(RENDERMODE_CONTINUOUSLY);
                     mBtn.setText("后台渲染");
 //                } else {
 //                    //startBgRender();
@@ -141,6 +141,8 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
                 ByteBuffer buf = ByteBuffer.allocate(bytes);
                 bitmap.copyPixelsToBuffer(buf);
                 byte[] byteArray = buf.array();
+               // mGLSurfaceView.setAspectRatio(bitmap.getWidth(), bitmap.getHeight());
+
                 render.setImageData(IMAGE_FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(),byteArray);
             }
         }
@@ -164,8 +166,12 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         lp.addRule(RelativeLayout.CENTER_IN_PARENT);
+        //loadRGBAImage(R.drawable.ic_launcher_foreground, mGLRender);
+        //mGLSurfaceView.setRenderMode(RENDERMODE_CONTINUOUSLY);
         mGLSurfaceView = new MySurfaceView(this, mGLRender);
+        mGLSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
         mRootView.addView(mGLSurfaceView, lp);
+
        // mGLSurfaceView.setRenderMode(RENDERMODE_CONTINUOUSLY);
 
     }

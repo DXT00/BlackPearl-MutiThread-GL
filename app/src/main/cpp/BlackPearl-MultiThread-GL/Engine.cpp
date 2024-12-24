@@ -5,8 +5,7 @@ void Engine::Init()
 {
     //eglRender = new EGLRender();
     eglRender = new SharedEGLContextRenderer();
-
-    eglRender->Init();
+    pNativeImage = new NativeImage();
 }
 
 void Engine::Clear()
@@ -28,30 +27,41 @@ void Engine::OnSurfaceChanged(int width, int height)
 }
 
 void Engine::DrawFrame() {
+    if(!rendererInit){
+        eglRender->Init();
+        rendererInit = true;
+    }
+
     eglRender->Draw();
 }
 void Engine::SetImageData(int format, uint8_t *pData, int width, int height){
-    LOGCATE("MyGLRenderContext::SetImageData format=%d, width=%d, height=%d, pData=%p", format, width, height, pData);
-    NativeImage nativeImage;
-    nativeImage.format = format;
-    nativeImage.width = width;
-    nativeImage.height = height;
-    nativeImage.ppPlane[0] = pData;
+    //LOGCATE("MyGLRenderContext::SetImageData format=%d, width=%d, height=%d, pData=%p", format, width, height, pData);
+    LOGCATE("MyGLRenderContext::SetImageData");
+    if(!pNativeImage){
+        LOGCATE("MyGLRenderContext::pNativeImage = nullptr");
+
+        return;
+    }
+    pNativeImage->format = format;
+    pNativeImage->width = width;
+    pNativeImage->height = height;
+    pNativeImage->ppPlane[0] = pData;
+    LOGCATE("MyGLRenderContext::SetImageData1");
 
     switch (format)
     {
         case IMAGE_FORMAT_NV12:
         case IMAGE_FORMAT_NV21:
-            nativeImage.ppPlane[1] = nativeImage.ppPlane[0] + width * height;
+            pNativeImage->ppPlane[1] = pNativeImage->ppPlane[0] + width * height;
             break;
         case IMAGE_FORMAT_I420:
-            nativeImage.ppPlane[1] = nativeImage.ppPlane[0] + width * height;
-            nativeImage.ppPlane[2] = nativeImage.ppPlane[1] + width * height / 4;
+            pNativeImage->ppPlane[1] = pNativeImage->ppPlane[0] + width * height;
+            pNativeImage->ppPlane[2] = pNativeImage->ppPlane[1] + width * height / 4;
             break;
         default:
             break;
     }
 
-
-    eglRender->LoadImage(&nativeImage);
+    LOGCATE("MyGLRenderContext::SetImageData eglRender->LoadImage");
+    eglRender->LoadImage(pNativeImage);
 }

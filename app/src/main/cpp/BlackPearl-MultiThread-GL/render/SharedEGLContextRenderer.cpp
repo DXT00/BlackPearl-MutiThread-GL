@@ -22,13 +22,16 @@ SharedEGLContextRenderer::~SharedEGLContextRenderer()
 
 void SharedEGLContextRenderer::LoadImage(NativeImage *pImage)
 {
-	LOGCATE("SharedEGLContextSample::LoadImage pImage = %p", pImage->ppPlane[0]);
+    LOGCATE("SharedEGLContextSample::LoadImage pImage");//
+	//LOGCATE("SharedEGLContextSample::LoadImage pImage = %p", pImage->ppPlane[0]);
 	if (pImage)
 	{
 		m_RenderImage.width = pImage->width;
 		m_RenderImage.height = pImage->height;
 		m_RenderImage.format = pImage->format;
-		NativeImageUtil::CopyNativeImage(pImage, &m_RenderImage);
+        LOGCATE("SharedEGLContextSample::LoadImage CopyNativeImage");//
+
+        NativeImageUtil::CopyNativeImage(pImage, &m_RenderImage);
 	}
 }
 
