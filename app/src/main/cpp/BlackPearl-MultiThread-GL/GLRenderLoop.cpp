@@ -1,4 +1,3 @@
-#include "D:/AA_LEARN_CODING/LearnOpenGL/BlackPearl-MutiThread-GL/build/CMakeFiles/BlackPearl-MultiThread-GL.dir/Debug/cmake_pch.hxx"
 #include "GLRenderLoop.h"
 
 #include "GLES3/gl3.h"
@@ -107,7 +106,7 @@ void GLRenderLooper::OnDrawFrame() {
         return;
     }
     SizeF imgSizeF = m_GLEnv->imgSize;
-
+    LOGCATE("GLRenderLooper::OnDrawFrame imgSizeF = %d",imgSizeF);
     glBindFramebuffer(GL_FRAMEBUFFER, m_FboId);
     glViewport(0, 0, imgSizeF.width, imgSizeF.height);
     glUseProgram(m_GLEnv->program);

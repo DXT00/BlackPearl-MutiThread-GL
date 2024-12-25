@@ -69,66 +69,24 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         mBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //if (mBtn.getText().equals("重置")) {
-//                    mImageView.setImageResource(R.drawable.ic_launcher_background);
-                    //mGLRender.init();
 
-
-//        mRootView.removeView(mGLSurfaceView);
                     RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
                     lp.addRule(RelativeLayout.CENTER_IN_PARENT);
-
-
-//                    mGLSurfaceView = new MySurfaceView(MainActivity.this, mGLRender);
-//                    mRootView.addView(mGLSurfaceView, lp);
-//
-                    //mGLSurfaceView.setRenderMode(RENDERMODE_CONTINUOUSLY);
-                    //mGLRender.setParamsInt(SAMPLE_TYPE, position + SAMPLE_TYPE, 0);
 
                     if (mRootView.getWidth() != mGLSurfaceView.getWidth()
                             || mRootView.getHeight() != mGLSurfaceView.getHeight()) {
                         mGLSurfaceView.setAspectRatio(mRootView.getWidth(), mRootView.getHeight());
                     }
                     mGLRender.beginDraw = true;
-                    loadRGBAImage(R.drawable.ic_launcher_foreground, mGLRender);
+                    loadRGBAImage(R.drawable.lye, mGLRender);
                     mGLSurfaceView.requestRender();
                     mGLSurfaceView.setRenderMode(RENDERMODE_CONTINUOUSLY);
                     mBtn.setText("后台渲染");
-//                } else {
-//                    //startBgRender();
-//                    mBtn.setText("重置");
-//                }
+
             }
         });
 
-//        dialog.show();
-//        dialog.getWindow().setContentView(rootView);
-    }
-    private Bitmap createBitmapFromGLSurface(int x, int y, int w, int h) {
-        int bitmapBuffer[] = new int[w * h];
-        int bitmapSource[] = new int[w * h];
-        IntBuffer intBuffer = IntBuffer.wrap(bitmapBuffer);
-        intBuffer.position(0);
-        try {
-            GLES20.glReadPixels(x, y, w, h, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE,
-                    intBuffer);
-            int offset1, offset2;
-            for (int i = 0; i < h; i++) {
-                offset1 = i * w;
-                offset2 = (h - i - 1) * w;
-                for (int j = 0; j < w; j++) {
-                    int texturePixel = bitmapBuffer[offset1 + j];
-                    int blue = (texturePixel >> 16) & 0xff;
-                    int red = (texturePixel << 16) & 0x00ff0000;
-                    int pixel = (texturePixel & 0xff00ff00) | red | blue;
-                    bitmapSource[offset2 + j] = pixel;
-                }
-            }
-        } catch (GLException e) {
-            return null;
-        }
-        return Bitmap.createBitmap(bitmapSource, w, h, Bitmap.Config.ARGB_8888);
     }
 
     private void loadRGBAImage(int resId, MyGLRender render) {
@@ -166,13 +124,10 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         lp.addRule(RelativeLayout.CENTER_IN_PARENT);
-        //loadRGBAImage(R.drawable.ic_launcher_foreground, mGLRender);
-        //mGLSurfaceView.setRenderMode(RENDERMODE_CONTINUOUSLY);
+
         mGLSurfaceView = new MySurfaceView(this, mGLRender);
         mGLSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
         mRootView.addView(mGLSurfaceView, lp);
-
-       // mGLSurfaceView.setRenderMode(RENDERMODE_CONTINUOUSLY);
 
     }
     /**

@@ -178,7 +178,7 @@ void SharedEGLContextRenderer::Init()
 	m_GLEnv.imgSize       = imgSize;
 	m_GLEnv.renderDone    = OnAsyncRenderDone;
 	m_GLEnv.callbackCtx   = this;
-    LOGCATE("SharedEGLContextSample::Init sharedCtx=%p", m_GLEnv.sharedCtx);
+    LOGCATE("SharedEGLContextSample::Init sharedCtx=%p, inputTexId=%d, inputTex Width=%d, inputTexId Height=%d", m_GLEnv.sharedCtx, m_GLEnv.inputTexId, m_RenderImage.width, m_RenderImage.height);
 
     GLRenderLooper::GetInstance()->postMessage(MSG_SurfaceCreated, &m_GLEnv);
 
